@@ -2,174 +2,141 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Rate Calculator</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Monthly Report</title>
   <style>
-    /* Base Reset */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
     body {
       font-family: Arial, sans-serif;
-      background-color: #f4f4f4;
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      background: #f0f4f8;
       padding: 20px;
     }
 
-    .container {
-      background-color: #fff;
-      padding: 30px 25px;
-      border-radius: 10px;
-      width: 100%;
-      max-width: 400px;
-      border: 1px solid #ddd;
-    }
-
-    h2 {
+    h1 {
       text-align: center;
       color: #333;
-      margin-bottom: 20px;
-      font-weight: 600;
-      font-size: 22px;
+    }
+
+    .container {
+      max-width: 500px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     }
 
     label {
       display: block;
-      margin-top: 15px;
-      font-size: 15px;
-      color: #333;
+      margin-top: 10px;
     }
 
-    input, select {
-      width: 100%;
-      padding: 12px;
-      margin-top: 6px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 15px;
+    input {
+      width: 95%;
+      padding: 8px;
+      margin-top: 5px;
     }
 
-    input:focus, select:focus {
-      outline: none;
-      border-color: #007bff;
+    #results {
+      margin-top: 20px;
+      background: #e8f0fe;
+      padding: 15px;
+      border-radius: 5px;
     }
 
     button {
+      margin-top: 15px;
+      padding: 10px;
       width: 100%;
-      padding: 14px;
       background-color: #007bff;
       color: white;
-      font-size: 16px;
       border: none;
-      border-radius: 6px;
-      margin-top: 25px;
-      cursor: pointer;
-      transition: background-color 0.3s;
+      border-radius: 5px;
+      font-size: 16px;
     }
 
     button:hover {
       background-color: #0056b3;
     }
-
-    .result {
-      margin-top: 25px;
-      font-size: 16px;
-      color: #333;
-    }
-
-    .result p {
-      margin: 10px 0;
-    }
-
-    .result span {
-      font-weight: bold;
-    }
-
-    /* Responsive: Larger and centered on small screens */
-    @media (max-width: 600px) {
-      .container {
-        padding: 40px 30px;
-        font-size: 18px;
-      }
-
-      h2 {
-        font-size: 24px;
-      }
-
-      input, select, button {
-        font-size: 17px;
-      }
-
-      button {
-        padding: 16px;
-      }
-
-      .result {
-        font-size: 17px;
-      }
-    }
+    @media print {
+  body * {
+    visibility: hidden;
+  }
+  .report-section, .report-section * {
+    visibility: visible;
+  }
+  .report-section {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+}
   </style>
 </head>
 <body>
+  <div class="report-section">
+  <!-- Existing Report HTML goes here -->
 
-<div class="container">
-  <h2>Rate Calculator</h2>
+  <div class="container">
+    <h1>Monthly Expense Report</h1>
 
-  <!-- Product Dropdown -->
-  <label for="product">Product Name:</label>
-  <select id="product" onchange="updateRate()">
-    <option value="" disabled selected>Select Product</option>
-    <option value="119">Rollan</option>
-    <option value="149">Gel</option>
-    <option value="349">Spray</option>
+    <p><strong>Date:</strong> <span id="currentDate"></span></p>
 
-  </select>
+    <label>Room Rent (₹):</label>
+    <input type="number" id="rent" placeholder="Enter rent amount">
 
-  <label for="rate">Rate (₹):</label>
-  <input type="number" id="rate" value="" placeholder="Enter rate">
+    <label>Electric Bill (₹):</label>
+    <input type="number" id="electricity" placeholder="Enter full electric bill">
 
-  <label for="units">Units:</label>
-  <input type="number" id="units" value="" placeholder="Enter number of units">
+    <label>Deposit (₹) - One Time:</label>
+    <input type="number" id="deposit" placeholder="Enter deposit if any">
 
-  <label for="discount">Discount %:</label>
-  <input type="number" id="discount" value="" placeholder="Enter discount percentage">
+    <button onclick="calculate()">Calculate</button>
+   <button onclick="window.print()" style="background-color: #10d371; color: #fff; padding: 10px; border: none; width: 100%; margin-top: 10px;">
+  Print or Save as PDF
+</button>
 
-  <button onclick="calculate()">Calculate</button>
 
-  <div class="result">
-    <p>Total Amount: ₹<span id="total">0.00</span></p>
-    <p>Discount Amount: ₹<span id="discountAmount">0.00</span></p>
-    <p>After Discount: ₹<span id="afterDiscount">0.00</span></p>
+
+    <div id="results">
+      
+      <p><strong>Your Monthly Rent:</strong> ₹<span id="mrent">0</span></p>
+      <p><strong>Your Share of Electricity:</strong> ₹<span id="halfElectricity">0</span></p>
+      <p><strong>Total This Month:</strong> ₹<span id="total">0</span></p>
+      <!-- <p><strong>Remaining Balance:</strong> ₹<span id="remaining">0</span></p> -->
+       <p><strong>Your Deposit:</strong> ₹<span id="mdeposit">0</span></p>
+    </div>
   </div>
 </div>
 
-<script>
-  function updateRate() {
-    const productSelect = document.getElementById("product");
-    const rateInput = document.getElementById("rate");
-    rateInput.value = productSelect.value;
-  }
 
-  function calculate() {
-    const rate = parseFloat(document.getElementById("rate").value) || 0;
-    const units = parseFloat(document.getElementById("units").value) || 0;
-    const discountPercent = parseFloat(document.getElementById("discount").value) || 0;
 
-    const total = rate * units;
-    const discountAmount = (total * discountPercent) / 100;
-    const afterDiscount = total - discountAmount;
+  <script>
+    // Set current date
+    document.getElementById("currentDate").textContent = new Date().toLocaleDateString();
 
-    document.getElementById("total").textContent = total.toFixed(2);
-    document.getElementById("discountAmount").textContent = discountAmount.toFixed(2);
-    document.getElementById("afterDiscount").textContent = afterDiscount.toFixed(2);
-  }
-</script>
+    function calculate() {
+      const rent = parseFloat(document.getElementById("rent").value) || 0;
+      const electricity = parseFloat(document.getElementById("electricity").value) || 0;
+      const deposit = parseFloat(document.getElementById("deposit").value) || 0;
+     
+      const mrent = rent;
+      const halfElectricity = electricity / 2;
+      const monthlyTotal = rent + halfElectricity;
+      const remaining = deposit - monthlyTotal;
+      const mdeposit = deposit;
 
+       document.getElementById("mrent").textContent = mrent.toFixed(2);
+      document.getElementById("halfElectricity").textContent = halfElectricity.toFixed(2);
+      document.getElementById("total").textContent = monthlyTotal.toFixed(2);
+      document.getElementById("mdeposit").textContent = mdeposit.toFixed(2);
+      document.getElementById("remaining").textContent = remaining.toFixed(2);
+       
+    }
+
+
+
+
+  </script>
+  
 </body>
 </html>
