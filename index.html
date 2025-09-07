@@ -11,8 +11,7 @@
       margin: 0;
     }
 
-    h1,
-    h2 {
+    h1, h2 {
       text-align: center;
       color: #333;
       margin-bottom: 15px;
@@ -20,7 +19,7 @@
 
     .container {
       width: 95%;
-      max-width: 600px; /* mobile default */
+      max-width: 600px;
       margin: auto;
       background: white;
       padding: 20px;
@@ -29,7 +28,6 @@
       box-sizing: border-box;
     }
 
-    /* Larger width on tablets and desktops */
     @media (min-width: 768px) {
       .container {
         max-width: 900px;
@@ -43,8 +41,7 @@
       color: #333;
     }
 
-    input,
-    select {
+    input, select {
       width: 100%;
       padding: 10px 12px;
       margin-top: 5px;
@@ -57,8 +54,7 @@
       outline: none;
     }
 
-    input:focus,
-    select:focus {
+    input:focus, select:focus {
       border-color: #007bff;
       background-color: #fff;
       box-shadow: 0 0 4px rgba(0, 123, 255, 0.4);
@@ -71,9 +67,6 @@
       border: none;
       border-radius: 5px;
       font-size: 16px;
-      display: inline-block;
-      text-align: center;
-      user-select: none;
       color: white;
       cursor: pointer;
     }
@@ -82,43 +75,32 @@
       opacity: 0.9;
     }
 
-    #addEntry {
-      background-color: #007bff;
-    }
+    #addEntry { background-color: #007bff; }
+    #print { background-color: #10d371; }
+    #clearAll { background-color: #dc3545; }
+    #exportCSV { background-color: #f0ad4e; }
 
-    #print {
-      background-color: #10d371;
-    }
-
-    #clearAll {
-      background-color: #dc3545;
-    }
-
-    #results,
-    #history {
+    #results, #history {
       margin-top: 30px;
       background: #e8f0fe;
       padding: 15px;
       border-radius: 5px;
     }
 
-    /* History container: allow horizontal scroll only on small screens */
     #history {
       overflow-x: auto;
-      -webkit-overflow-scrolling: touch; /* smooth scrolling on iOS */
+      -webkit-overflow-scrolling: touch;
     }
 
-    /* History table styling */
     #historyTable {
       width: 100%;
       border-collapse: collapse;
       table-layout: fixed;
       font-size: 14px;
-      min-width: 700px; /* table min width on larger screens */
+      min-width: 700px;
     }
 
-    #historyTable th,
-    #historyTable td {
+    #historyTable th, #historyTable td {
       padding: 6px 8px;
       border: 1px solid #ccc;
       word-wrap: break-word;
@@ -131,20 +113,17 @@
       color: white;
     }
 
+    .action-buttons button {
+      margin: 2px;
+      padding: 5px 8px;
+      font-size: 12px;
+    }
+
     @media print {
-      body * {
-        visibility: hidden;
-      }
-      .report-section,
-      .report-section * {
-        visibility: visible;
-      }
-      .report-section {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-      }
+      body * { visibility: hidden; }
+      .report-section, .report-section * { visibility: visible; }
+      .report-section { position: absolute; left: 0; top: 0; width: 100%; }
+      button { display: none; }
     }
   </style>
 </head>
@@ -160,12 +139,7 @@
       <input type="number" id="rent" placeholder="Enter rent amount" min="0" />
 
       <label>Electric Bill (₹):</label>
-      <input
-        type="number"
-        id="electricity"
-        placeholder="Enter full electric bill"
-        min="0"
-      />
+      <input type="number" id="electricity" placeholder="Enter full electric bill" min="0" />
 
       <label>Electricity Share (%):</label>
       <select id="share">
@@ -176,40 +150,25 @@
       </select>
 
       <label>Deposit (₹):</label>
-      <input
-        type="number"
-        id="deposit"
-        placeholder="Enter deposit if any"
-        min="0"
-      />
+      <input type="number" id="deposit" placeholder="Enter deposit if any" min="0" />
 
       <label>Paid Amount (₹):</label>
-      <input
-        type="number"
-        id="paidAmount"
-        placeholder="Enter amount you paid this month"
-        min="0"
-      />
+      <input type="number" id="paidAmount" placeholder="Enter amount you paid this month" min="0" />
 
       <button id="addEntry" onclick="addEntry()">➕ Add Entry</button>
       <button id="print" onclick="window.print()">🖨️ Print or Save as PDF</button>
+      <button id="exportCSV" onclick="exportCSV()">⬇️ Export CSV</button>
       <button id="clearAll" onclick="clearAllData()">🔄 Refresh / Clear All</button>
 
       <div id="results">
         <h2>Latest Calculation</h2>
         <p><strong>Date:</strong> <span id="selectedDate">-</span></p>
         <p><strong>Your Monthly Rent:</strong> ₹<span id="mrent">0</span></p>
-        <p>
-          <strong>Your Share of Electricity:</strong> ₹
-          <span id="shareElectricity">0</span>
-        </p>
+        <p><strong>Your Share of Electricity:</strong> ₹<span id="shareElectricity">0</span></p>
         <p><strong>Total This Month:</strong> ₹<span id="total">0</span></p>
         <p><strong>Your Deposit:</strong> ₹<span id="mdeposit">0</span></p>
         <p><strong>Paid Amount:</strong> ₹<span id="mpaid">0</span></p>
-        <p>
-          <strong>Remaining Balance (Paid - Total):</strong> ₹
-          <span id="remaining">0</span>
-        </p>
+        <p><strong>Remaining Balance (Paid - Total):</strong> ₹<span id="remaining">0</span></p>
       </div>
 
       <div id="history">
@@ -224,35 +183,42 @@
               <th>Paid (₹)</th>
               <th>Deposit (₹)</th>
               <th>Remaining (₹)</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody></tbody>
+          <tfoot>
+            <tr>
+              <th colspan="3">Total</th>
+              <th id="sumTotal">₹0</th>
+              <th id="sumPaid">₹0</th>
+              <th>-</th>
+              <th id="sumRemaining">₹0</th>
+              <th></th>
+            </tr>
+          </tfoot>
         </table>
       </div>
     </div>
   </div>
 
   <script>
+    let editIndex = null;
+
     window.onload = function () {
       updateTable();
     };
 
     function addEntry() {
       const rent = parseFloat(document.getElementById("rent").value) || 0;
-      const electricity =
-        parseFloat(document.getElementById("electricity").value) || 0;
+      const electricity = parseFloat(document.getElementById("electricity").value) || 0;
       const deposit = parseFloat(document.getElementById("deposit").value) || 0;
       const share = parseFloat(document.getElementById("share").value);
-      const paidAmount =
-        parseFloat(document.getElementById("paidAmount").value) || 0;
+      const paidAmount = parseFloat(document.getElementById("paidAmount").value) || 0;
       const selectedDate = document.getElementById("fullDate").value;
 
       if (!selectedDate) {
         alert("Please select a date.");
-        return;
-      }
-      if (rent < 0 || electricity < 0 || deposit < 0 || paidAmount < 0) {
-        alert("Please enter valid (non-negative) amounts.");
         return;
       }
 
@@ -261,9 +227,7 @@
       const remaining = paidAmount - total;
 
       const formattedDate = new Date(selectedDate).toLocaleDateString("en-IN", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
+        year: "numeric", month: "long", day: "numeric",
       });
 
       const entry = {
@@ -277,19 +241,18 @@
       };
 
       const entries = JSON.parse(localStorage.getItem("expenseEntries")) || [];
-      entries.push(entry);
-      localStorage.setItem("expenseEntries", JSON.stringify(entries));
 
+      if (editIndex !== null) {
+        entries[editIndex] = entry;
+        editIndex = null;
+      } else {
+        entries.push(entry);
+      }
+
+      localStorage.setItem("expenseEntries", JSON.stringify(entries));
       updateLatest(entry);
       updateTable();
-
-      // Clear form inputs after adding
-      document.getElementById("fullDate").value = "";
-      document.getElementById("rent").value = "";
-      document.getElementById("electricity").value = "";
-      document.getElementById("deposit").value = "";
-      document.getElementById("paidAmount").value = "";
-      document.getElementById("share").value = "0.5";
+      clearForm();
     }
 
     function updateLatest(entry) {
@@ -307,9 +270,10 @@
       const tbody = document.querySelector("#historyTable tbody");
       tbody.innerHTML = "";
 
-      entries.forEach((entry) => {
-        const tr = document.createElement("tr");
+      let totalSum = 0, paidSum = 0, remainingSum = 0;
 
+      entries.forEach((entry, index) => {
+        const tr = document.createElement("tr");
         tr.innerHTML = `
           <td>${entry.date}</td>
           <td>₹${entry.rent}</td>
@@ -318,45 +282,76 @@
           <td>₹${entry.paid}</td>
           <td>₹${entry.deposit}</td>
           <td>₹${entry.remaining}</td>
+          <td class="action-buttons">
+            <button onclick="editEntry(${index})">✏️</button>
+            <button onclick="deleteEntry(${index})">🗑️</button>
+          </td>
         `;
-
         tbody.appendChild(tr);
+
+        totalSum += parseFloat(entry.total);
+        paidSum += parseFloat(entry.paid);
+        remainingSum += parseFloat(entry.remaining);
       });
 
-      // Update latest result if entries exist
+      document.getElementById("sumTotal").textContent = `₹${totalSum.toFixed(2)}`;
+      document.getElementById("sumPaid").textContent = `₹${paidSum.toFixed(2)}`;
+      document.getElementById("sumRemaining").textContent = `₹${remainingSum.toFixed(2)}`;
+
       if (entries.length > 0) {
         updateLatest(entries[entries.length - 1]);
-      } else {
-        // Clear latest display if no data
-        document.getElementById("selectedDate").textContent = "-";
-        document.getElementById("mrent").textContent = "0";
-        document.getElementById("shareElectricity").textContent = "0";
-        document.getElementById("total").textContent = "0";
-        document.getElementById("mdeposit").textContent = "0";
-        document.getElementById("mpaid").textContent = "0";
-        document.getElementById("remaining").textContent = "0";
       }
     }
 
+    function clearForm() {
+      document.getElementById("fullDate").value = "";
+      document.getElementById("rent").value = "";
+      document.getElementById("electricity").value = "";
+      document.getElementById("deposit").value = "";
+      document.getElementById("paidAmount").value = "";
+      document.getElementById("share").value = "0.5";
+    }
+
     function clearAllData() {
-      if (
-        confirm(
-          "Are you sure you want to clear all entries? This action cannot be undone."
-        )
-      ) {
+      if (confirm("Are you sure you want to clear all entries? This action cannot be undone.")) {
         localStorage.removeItem("expenseEntries");
         updateTable();
-
-        // Also clear inputs and latest
-        document.getElementById("fullDate").value = "";
-        document.getElementById("rent").value = "";
-        document.getElementById("electricity").value = "";
-        document.getElementById("deposit").value = "";
-        document.getElementById("paidAmount").value = "";
-        document.getElementById("share").value = "0.5";
-
+        clearForm();
         alert("All entries cleared.");
       }
+    }
+
+    function editEntry(index) {
+      const entries = JSON.parse(localStorage.getItem("expenseEntries")) || [];
+      const entry = entries[index];
+      editIndex = index;
+
+      document.getElementById("fullDate").value = new Date(entry.date).toISOString().split("T")[0];
+      document.getElementById("rent").value = parseFloat(entry.rent);
+      document.getElementById("electricity").value = (parseFloat(entry.electricity) / parseFloat(document.getElementById("share").value)).toFixed(2);
+      document.getElementById("deposit").value = parseFloat(entry.deposit);
+      document.getElementById("paidAmount").value = parseFloat(entry.paid);
+    }
+
+    function deleteEntry(index) {
+      const entries = JSON.parse(localStorage.getItem("expenseEntries")) || [];
+      entries.splice(index, 1);
+      localStorage.setItem("expenseEntries", JSON.stringify(entries));
+      updateTable();
+    }
+
+    function exportCSV() {
+      const entries = JSON.parse(localStorage.getItem("expenseEntries")) || [];
+      const csvRows = [["Date", "Rent", "Electricity", "Total", "Paid", "Deposit", "Remaining"]];
+      entries.forEach(entry => {
+        csvRows.push([entry.date, entry.rent, entry.electricity, entry.total, entry.paid, entry.deposit, entry.remaining]);
+      });
+      const csvContent = csvRows.map(e => e.join(",")).join("\n");
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "Sandeep_Rent_Report.csv";
+      link.click();
     }
   </script>
 </body>
