@@ -1,17 +1,363 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8" />
+  <title>Sandeep Rent Report</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f4f8;
+      padding: 20px;
+      margin: 0;
+    }
+
+    h1,
+    h2 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 15px;
+    }
+
+    .container {
+      width: 95%;
+      max-width: 600px; /* mobile default */
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      box-sizing: border-box;
+    }
+
+    /* Larger width on tablets and desktops */
+    @media (min-width: 768px) {
+      .container {
+        max-width: 900px;
+      }
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: 10px 12px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      background-color: #f9f9f9;
+      box-sizing: border-box;
+      transition: all 0.3s ease;
+      font-size: 15px;
+      outline: none;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: #007bff;
+      background-color: #fff;
+      box-shadow: 0 0 4px rgba(0, 123, 255, 0.4);
+    }
+
+    button {
+      margin-top: 15px;
+      padding: 10px;
+      width: 100%;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      display: inline-block;
+      text-align: center;
+      user-select: none;
+      color: white;
+      cursor: pointer;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
+    #addEntry {
+      background-color: #007bff;
+    }
+
+    #print {
+      background-color: #10d371;
+    }
+
+    #clearAll {
+      background-color: #dc3545;
+    }
+
+    #results,
+    #history {
+      margin-top: 30px;
+      background: #e8f0fe;
+      padding: 15px;
+      border-radius: 5px;
+    }
+
+    /* History container: allow horizontal scroll only on small screens */
+    #history {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch; /* smooth scrolling on iOS */
+    }
+
+    /* History table styling */
+    #historyTable {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      font-size: 14px;
+      min-width: 700px; /* table min width on larger screens */
+    }
+
+    #historyTable th,
+    #historyTable td {
+      padding: 6px 8px;
+      border: 1px solid #ccc;
+      word-wrap: break-word;
+      white-space: normal;
+      text-align: center;
+    }
+
+    #historyTable th {
+      background-color: #007bff;
+      color: white;
+    }
+
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      .report-section,
+      .report-section * {
+        visibility: visible;
+      }
+      .report-section {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+      }
+    }
+  </style>
 </head>
 <body>
-    <MARQUEE align-item : left;><p> OM NAMH SHIVAY</p></MARQUEE>
-    <MARQUEE><p> OM NAMH SHIVAY</p></MARQUEE>
-    <MARQUEE><p> OM NAMH SHIVAY</p></MARQUEE>
-    <MARQUEE><p> OM NAMH SHIVAY</p></MARQUEE>
-    <MARQUEE><p> OM NAMH SHIVAY</p></MARQUEE>
-    <MARQUEE><p> OM NAMH SHIVAY</p></MARQUEE>
-    
+  <div class="report-section">
+    <div class="container">
+      <h1>Sandeep Rent Report</h1>
+
+      <label for="fullDate">Select Date:</label>
+      <input type="date" id="fullDate" />
+
+      <label>Room Rent (₹):</label>
+      <input type="number" id="rent" placeholder="Enter rent amount" min="0" />
+
+      <label>Electric Bill (₹):</label>
+      <input
+        type="number"
+        id="electricity"
+        placeholder="Enter full electric bill"
+        min="0"
+      />
+
+      <label>Electricity Share (%):</label>
+      <select id="share">
+        <option value="0.25">25%</option>
+        <option value="0.5" selected>50%</option>
+        <option value="0.75">75%</option>
+        <option value="1">100%</option>
+      </select>
+
+      <label>Deposit (₹):</label>
+      <input
+        type="number"
+        id="deposit"
+        placeholder="Enter deposit if any"
+        min="0"
+      />
+
+      <label>Paid Amount (₹):</label>
+      <input
+        type="number"
+        id="paidAmount"
+        placeholder="Enter amount you paid this month"
+        min="0"
+      />
+
+      <button id="addEntry" onclick="addEntry()">➕ Add Entry</button>
+      <button id="print" onclick="window.print()">🖨️ Print or Save as PDF</button>
+      <button id="clearAll" onclick="clearAllData()">🔄 Refresh / Clear All</button>
+
+      <div id="results">
+        <h2>Latest Calculation</h2>
+        <p><strong>Date:</strong> <span id="selectedDate">-</span></p>
+        <p><strong>Your Monthly Rent:</strong> ₹<span id="mrent">0</span></p>
+        <p>
+          <strong>Your Share of Electricity:</strong> ₹
+          <span id="shareElectricity">0</span>
+        </p>
+        <p><strong>Total This Month:</strong> ₹<span id="total">0</span></p>
+        <p><strong>Your Deposit:</strong> ₹<span id="mdeposit">0</span></p>
+        <p><strong>Paid Amount:</strong> ₹<span id="mpaid">0</span></p>
+        <p>
+          <strong>Remaining Balance (Paid - Total):</strong> ₹
+          <span id="remaining">0</span>
+        </p>
+      </div>
+
+      <div id="history">
+        <h2>History</h2>
+        <table id="historyTable">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Rent (₹)</th>
+              <th>Electricity (₹)</th>
+              <th>Total (₹)</th>
+              <th>Paid (₹)</th>
+              <th>Deposit (₹)</th>
+              <th>Remaining (₹)</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    window.onload = function () {
+      updateTable();
+    };
+
+    function addEntry() {
+      const rent = parseFloat(document.getElementById("rent").value) || 0;
+      const electricity =
+        parseFloat(document.getElementById("electricity").value) || 0;
+      const deposit = parseFloat(document.getElementById("deposit").value) || 0;
+      const share = parseFloat(document.getElementById("share").value);
+      const paidAmount =
+        parseFloat(document.getElementById("paidAmount").value) || 0;
+      const selectedDate = document.getElementById("fullDate").value;
+
+      if (!selectedDate) {
+        alert("Please select a date.");
+        return;
+      }
+      if (rent < 0 || electricity < 0 || deposit < 0 || paidAmount < 0) {
+        alert("Please enter valid (non-negative) amounts.");
+        return;
+      }
+
+      const shareElectricity = electricity * share;
+      const total = rent + shareElectricity;
+      const remaining = paidAmount - total;
+
+      const formattedDate = new Date(selectedDate).toLocaleDateString("en-IN", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      });
+
+      const entry = {
+        date: formattedDate,
+        rent: rent.toFixed(2),
+        electricity: shareElectricity.toFixed(2),
+        total: total.toFixed(2),
+        paid: paidAmount.toFixed(2),
+        deposit: deposit.toFixed(2),
+        remaining: remaining.toFixed(2),
+      };
+
+      const entries = JSON.parse(localStorage.getItem("expenseEntries")) || [];
+      entries.push(entry);
+      localStorage.setItem("expenseEntries", JSON.stringify(entries));
+
+      updateLatest(entry);
+      updateTable();
+
+      // Clear form inputs after adding
+      document.getElementById("fullDate").value = "";
+      document.getElementById("rent").value = "";
+      document.getElementById("electricity").value = "";
+      document.getElementById("deposit").value = "";
+      document.getElementById("paidAmount").value = "";
+      document.getElementById("share").value = "0.5";
+    }
+
+    function updateLatest(entry) {
+      document.getElementById("selectedDate").textContent = entry.date;
+      document.getElementById("mrent").textContent = entry.rent;
+      document.getElementById("shareElectricity").textContent = entry.electricity;
+      document.getElementById("total").textContent = entry.total;
+      document.getElementById("mdeposit").textContent = entry.deposit;
+      document.getElementById("mpaid").textContent = entry.paid;
+      document.getElementById("remaining").textContent = entry.remaining;
+    }
+
+    function updateTable() {
+      const entries = JSON.parse(localStorage.getItem("expenseEntries")) || [];
+      const tbody = document.querySelector("#historyTable tbody");
+      tbody.innerHTML = "";
+
+      entries.forEach((entry) => {
+        const tr = document.createElement("tr");
+
+        tr.innerHTML = `
+          <td>${entry.date}</td>
+          <td>₹${entry.rent}</td>
+          <td>₹${entry.electricity}</td>
+          <td>₹${entry.total}</td>
+          <td>₹${entry.paid}</td>
+          <td>₹${entry.deposit}</td>
+          <td>₹${entry.remaining}</td>
+        `;
+
+        tbody.appendChild(tr);
+      });
+
+      // Update latest result if entries exist
+      if (entries.length > 0) {
+        updateLatest(entries[entries.length - 1]);
+      } else {
+        // Clear latest display if no data
+        document.getElementById("selectedDate").textContent = "-";
+        document.getElementById("mrent").textContent = "0";
+        document.getElementById("shareElectricity").textContent = "0";
+        document.getElementById("total").textContent = "0";
+        document.getElementById("mdeposit").textContent = "0";
+        document.getElementById("mpaid").textContent = "0";
+        document.getElementById("remaining").textContent = "0";
+      }
+    }
+
+    function clearAllData() {
+      if (
+        confirm(
+          "Are you sure you want to clear all entries? This action cannot be undone."
+        )
+      ) {
+        localStorage.removeItem("expenseEntries");
+        updateTable();
+
+        // Also clear inputs and latest
+        document.getElementById("fullDate").value = "";
+        document.getElementById("rent").value = "";
+        document.getElementById("electricity").value = "";
+        document.getElementById("deposit").value = "";
+        document.getElementById("paidAmount").value = "";
+        document.getElementById("share").value = "0.5";
+
+        alert("All entries cleared.");
+      }
+    }
+  </script>
 </body>
 </html>
